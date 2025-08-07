@@ -20,6 +20,7 @@ from phoenix.server.api.mutations.span_annotations_mutations import SpanAnnotati
 from phoenix.server.api.mutations.trace_annotations_mutations import TraceAnnotationMutationMixin
 from phoenix.server.api.mutations.trace_mutations import TraceMutationMixin
 from phoenix.server.api.mutations.user_mutations import UserMutationMixin
+from phoenix.server.api.mutations.saved_view_mutations import SavedViewMutationMixin
 
 
 @strawberry.type
@@ -40,5 +41,6 @@ class Mutation(
     TraceAnnotationMutationMixin,
     TraceMutationMixin,
     UserMutationMixin,
+    SavedViewMutationMixin,
 ):
     pass

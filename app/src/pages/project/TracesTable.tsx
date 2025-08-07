@@ -61,6 +61,7 @@ import { ProjectTableEmpty } from "./ProjectTableEmpty";
 import { RetrievalEvaluationLabel } from "./RetrievalEvaluationLabel";
 import { SpanColumnSelector } from "./SpanColumnSelector";
 import { SpanFilterConditionField } from "./SpanFilterConditionField";
+import { ViewsMenu } from "@phoenix/pages/project/ViewsMenu";
 import { SpanSelectionToolbar } from "./SpanSelectionToolbar";
 import { spansTableCSS } from "./styles";
 import { DEFAULT_SORT, getGqlSort, makeAnnotationColumnId } from "./tableUtils";
@@ -818,6 +819,7 @@ export function TracesTable(props: TracesTableProps) {
       >
         <Flex direction="row" gap="size-100" width="100%" alignItems="center">
           <SpanFilterConditionField onValidCondition={setFilterCondition} />
+          <ViewsMenu projectId={useParams().projectId as string} />
           <SpanColumnSelector columns={computedColumns} query={data} />
         </Flex>
       </View>

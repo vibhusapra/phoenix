@@ -1579,9 +1579,27 @@ type Mutation {
   patchUser(input: PatchUserInput!): UserMutationPayload!
   patchViewer(input: PatchViewerInput!): UserMutationPayload!
   deleteUsers(input: DeleteUsersInput!): Void
+
+  # Saved Views for filters
+  createSavedView(input: CreateSavedViewInput!): SavedViewMutationPayload!
+  patchSavedView(input: PatchSavedViewInput!): SavedViewMutationPayload!
+  deleteSavedViews(input: DeleteSavedViewsInput!): Boolean!
 }
 
 """An object with a Globally Unique ID"""
+type SavedView implements Node {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  owner: User!
+  filterCondition: String
+  timeRangeKey: String
+  timeRangeStart: DateTime
+  timeRangeEnd: DateTime
+  treatOrphansAsRoots: Boolean
+}
+
 interface Node {
   """The Globally Unique ID of this object"""
   id: ID!
@@ -1667,6 +1685,34 @@ input PatchUserInput {
   newRole: UserRoleInput
   newUsername: String
   newPassword: String
+}
+
+input CreateSavedViewInput {
+  projectId: ID!
+  name: String!
+  payload: SavedViewPayloadInput!
+}
+
+input PatchSavedViewInput {
+  id: ID!
+  name: String
+  payload: SavedViewPayloadInput
+}
+
+input DeleteSavedViewsInput {
+  ids: [ID!]!
+}
+
+input SavedViewPayloadInput {
+  filterCondition: String
+  timeRangeKey: String
+  timeRangeStart: DateTime
+  timeRangeEnd: DateTime
+  treatOrphansAsRoots: Boolean
+}
+
+type SavedViewMutationPayload {
+  node: SavedView!
 }
 
 input PatchViewerInput {
@@ -1755,6 +1801,9 @@ type Project implements Node {
   spanAnnotationScoreTimeSeries(timeRange: TimeRange!, timeBinConfig: TimeBinConfig): SpanAnnotationScoreTimeSeries!
   topModelsByCost(timeRange: TimeRange!): [GenerativeModel!]!
   topModelsByTokenCount(timeRange: TimeRange!): [GenerativeModel!]!
+
+  # Saved Views owned by the current user for this project
+  savedViews: [SavedView!]!
 }
 
 enum ProjectColumn {

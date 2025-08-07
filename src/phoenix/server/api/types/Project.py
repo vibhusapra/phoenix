@@ -701,18 +701,39 @@ class Project(Node):
             )
         return created_at
 
-    @strawberry.field
-    async def updated_at(
-        self,
-        info: Info[Context, None],
-    ) -> datetime:
-        if self.db_project:
-            updated_at = self.db_project.updated_at
-        else:
-            updated_at = await info.context.data_loaders.project_fields.load(
-                (self.project_rowid, models.Project.updated_at),
-            )
-        return updated_at
+     @strawberry.field
+     async def updated_at(
+         self,
+         info: Info[Context, None],
+     ) -> datetime:
+         if self.db_project:
+             updated_at = self.db_project.updated_at
+         else:
+             updated_at = await info.context.data_loaders.project_fields.load(
+                 (self.project_rowid, models.Project.updated_at),
+             )
+         return updated_at
+
+     @strawberry.field
+     async def saved_views(
+         self,
+         info: Info[Context, None],
+     ) -> list[Annotated[SavedView, lazy(".SavedView")]]:
+         from .SavedView import SavedView as GqlSavedView, to_gql_saved_view
+         # Require authenticated viewer
+         assert (request := info.context.request)
+         user = getattr(request, "user", None)
+         if not user or not isinstance(user.identity, (str, int)):
+             return []
+         owner_id = int(user.identity)
+         async with info.context.db() as session:
+             rows = await session.scalars(
+                 select(models.SavedView).where(
+                     models.SavedView.project_id == self.project_rowid,
+                     models.SavedView.owner_user_id == owner_id,
+                 ).order_by(models.SavedView.updated_at.desc())
+             )
+             return [to_gql_saved_view(r) for r in rows]
 
     @strawberry.field
     async def span_count_time_series(

@@ -1374,6 +1374,27 @@ class AccessToken(Base):
     __table_args__ = (dict(sqlite_autoincrement=True),)
 
 
+class SavedView(Base):
+    __tablename__ = "saved_views"
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    project_id: Mapped[int] = mapped_column(
+        ForeignKey("projects.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    owner_user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    payload: Mapped[dict[str, Any]] = mapped_column(JsonDict, nullable=False, default={})
+    created_at: Mapped[datetime] = mapped_column(UtcTimeStamp, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        UtcTimeStamp, server_default=func.now(), onupdate=func.now()
+    )
+
+    __table_args__ = (
+        UniqueConstraint("project_id", "owner_user_id", "name"),
+        dict(sqlite_autoincrement=True),
+    )
+
+
 class ApiKey(Base):
     __tablename__ = "api_keys"
     user_id: Mapped[int] = mapped_column(
